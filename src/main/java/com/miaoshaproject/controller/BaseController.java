@@ -14,6 +14,7 @@ import java.util.Map;
 
 public class BaseController {
 
+    public static final String CONTENT_TYPE_FORMED="application/x-www-form-urlencoded";
     //define exceptional handler to solve the exceptional which cant solve by controller
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)

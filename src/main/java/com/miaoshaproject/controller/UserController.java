@@ -15,15 +15,20 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 @Controller("user")
 @RequestMapping("/user")
+
 public class UserController extends BaseController {
 
     @Autowired
     private UserService userService;
 
-    @RequestMapping("/get")
+    @Autowired
+    private  HttpServletRequest httpServletRequest;
+
+    @RequestMapping("/getuser")
     @ResponseBody
     public CommonReturnType getUser(@RequestParam(name="id") Integer id) throws BusinessException {
        UserModel userModel= userService.getUserById(id);
@@ -36,6 +41,27 @@ public class UserController extends BaseController {
        UserVO userVO=  convertFromModel(userModel);
        return  CommonReturnType.create(userVO);
     }
+
+
+    //Get Otp
+    @RequestMapping(value = "/getotp",method ={RequestMethod.POST},consumes = CONTENT_TYPE_FORMED)
+    @ResponseBody
+    public CommonReturnType getOtp(@RequestParam(name="telephone") String telephone){
+
+        //Base on some rule to generate the otp
+        Random random=new Random();
+        int radomInt=random.nextInt(9999);
+        radomInt+=10000;
+        String optCode=String.valueOf(radomInt);
+
+        //otp relate to headphone, use httpseesion bind otp code and phone
+
+        httpServletRequest.getSession().setAttribute(telephone,optCode);
+        System.out.println("telephone="+telephone+" &otpCode="+optCode);
+        return CommonReturnType.create(null);
+    }
+
+
 
     private UserVO convertFromModel(UserModel userModel){
         if(userModel==null){
