@@ -1,12 +1,24 @@
 package com.miaoshaproject.service.model;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 public class UserModel {
     private Integer id;
+    @NotBlank(message = "User name cant be empty.")
     private String  name;
+    @NotNull(message = "Gender need fill.")
     private Integer gender;
+    @NotNull(message = "Age need fill.")
+    @Min(value = 0,message = "age need more than 0.")
+    @Max(value = 150,message = "age need less than 150.")
     private Integer age;
+    @NotNull(message = "Mobile phone cant be empty.")
     private String  telephone;
     private String  thirdpartyid;
+    @NotNull(message = "Password cant be empty.")
     private String  encryptPassword;
 
 

@@ -13,15 +13,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 @Controller("user")
 @RequestMapping("/user")
-@CrossOrigin
+@CrossOrigin(allowCredentials = "true",allowedHeaders = "*")
 public class UserController extends BaseController {
 
     @Autowired
@@ -30,15 +34,34 @@ public class UserController extends BaseController {
     @Autowired
     private  HttpServletRequest httpServletRequest;
 
-    //User Register
+    //user login
+    @RequestMapping("/login")
+    @ResponseBody
+    public CommonReturnType register(@RequestParam(name="telephone") String telephone,
+                                     @RequestParam(name="password") String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
 
+        if(org.apache.commons.lang3.StringUtils.isEmpty(telephone)||StringUtils.isEmpty(password)){
+
+            throw  new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"login parameter cant be empty");
+
+        }
+        UserModel userModel= userService.validateLogin(telephone,this.EncodeByMd5(password));
+
+        //add user info to session
+        this.httpServletRequest.getSession().setAttribute("IS_LOGIN",true);
+        this.httpServletRequest.getSession().setAttribute("LOGIN_USER",userModel);
+        return CommonReturnType.create(null);
+
+        //user register
+    }
+    //User Register
     @RequestMapping("/register")
     @ResponseBody
     public CommonReturnType register(@RequestParam(name="telephone") String telephone, @RequestParam(name="otpCode") String otpCode,
                                      @RequestParam(name="name") String name,
                                      @RequestParam(name="gender") Integer gender,
                                      @RequestParam(name="age") Integer age,
-                                     @RequestParam(name="password") String password) throws BusinessException {
+                                     @RequestParam(name="password") String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
         //verify code the same with the otpcode
         String inSessionOtpCode=(String) this.httpServletRequest.getSession().getAttribute(telephone);
         if(!com.alibaba.druid.util.StringUtils.equals(otpCode,inSessionOtpCode)){
@@ -50,11 +73,22 @@ public class UserController extends BaseController {
         userModel.setGender(gender);
         userModel.setAge(age);
         userModel.setTelephone(telephone);
-
-        userModel.setEncryptPassword(MD5Encoder.encode(password.getBytes()));
+        userModel.setThirdpartyid("1");
+        userModel.setEncryptPassword(this.EncodeByMd5(password));
+        userService.register(userModel);
         return CommonReturnType.create(null);
 
         //user register
+    }
+
+    public String EncodeByMd5(String str) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+
+        MessageDigest md5=MessageDigest.getInstance("MD5");
+        BASE64Encoder base64Encoder=new BASE64Encoder();
+
+        //Encry String
+        String newstr= base64Encoder.encode(md5.digest(str.getBytes("utf-8")));
+        return newstr;
     }
 
     @RequestMapping("/getuser")
