@@ -14,4 +14,10 @@ public interface ItemService {
     List<ItemModel> listItem();
 
     ItemModel getItemById(Integer id);
+
+    //Stock deduct
+    boolean decreaseStock(Integer itemId,Integer amount )  throws BusinessException;
+
+    //item sales increase
+    void increaseSales(Integer itemId,Integer amount) throws BusinessException;
 }

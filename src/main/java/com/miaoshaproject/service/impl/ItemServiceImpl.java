@@ -98,6 +98,28 @@ public class ItemServiceImpl implements ItemService {
         return itemModel;
     }
 
+    @Transactional
+    @Override
+    public boolean decreaseStock(Integer itemId, Integer amount) throws BusinessException {
+
+        int affectedRow=itemStockDOMapper.decreaseStock(itemId,amount);
+        //Update successfully
+        if(affectedRow>0){
+            return true;
+        }
+        else {
+        //Update failed
+            return false;
+        }
+    }
+
+    @Override
+    @Transactional
+    public void increaseSales(Integer itemId, Integer amount) throws BusinessException {
+            itemDOMapper.increaseSales(itemId,amount);
+
+    }
+
     private ItemModel convertModelFormDataObject(ItemDO itemdo, ItemStockDO itemStockDO){
         ItemModel itemModel=new ItemModel();
         BeanUtils.copyProperties(itemdo,itemModel);

@@ -10,8 +10,10 @@ public enum EmBusinessError implements CommonError{
 
     //10000 for user error
     USER_NOT_EXIST(20001,"User not exists"),
-    USER_LOGIN_FAIL(20002,"phone or password not correct")
-
+    USER_LOGIN_FAIL(20002,"phone or password not correct"),
+    USER_NOT_LOGIN(20003,"User not login the website"),
+    //30000 trading info error
+    STOCK_NOT_ENOUGH(30001,"stock not enough")
     ;
     private EmBusinessError(int errCode,String errMsg)
     {
